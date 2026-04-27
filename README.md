@@ -1,6 +1,6 @@
-# Student Marketplace MVP
+# KU Marketplace 
 
-A simple Facebook Marketplace-style web app for a database class project.
+A simple Facebook Marketplace-style web app for EECS 447.
 
 ## Features
 
@@ -38,37 +38,37 @@ Both demo accounts use:
 password123
 ```
 
-- alice@ku.edu
-- bob@ku.edu
+- serom@ku.edu
+- meg@ku.edu
 
-## Running Alice and Bob at the same time
+## Running Serom and Meg at the same time
 
 Two normal tabs in the same browser usually share the same Flask session, so they will not stay logged in as different users.
 
 Use one of these:
 
 ```text
-Window 1: normal browser window logged in as Alice
-Window 2: incognito/private browser window logged in as Bob
+Window 1: normal browser window logged in as Serom
+Window 2: incognito/private browser window logged in as Meg
 ```
 
 or:
 
 ```text
-Window 1: Chrome logged in as Alice
-Window 2: Edge/Firefox logged in as Bob
+Window 1: Chrome logged in as Serom
+Window 2: Edge/Firefox logged in as Meg
 ```
 
 ## Good demo flow
 
 1. Open the homepage and show that listings already exist.
-2. Log in as Alice in a normal browser window.
-3. Log in as Bob in an incognito/private window or another browser.
-4. As Bob, browse/search listings.
-5. As Bob, open one of Alice's listings.
-6. As Bob, save the listing and message Alice.
-7. As Alice, open Messages and show Bob's message.
-8. As Alice, open My Listings.
-9. As Alice, edit one listing.
-10. As Alice, mark one listing as sold to Bob.
+2. Log in as Serom in a normal browser window.
+3. Log in as Meg in an incognito/private window or another browser.
+4. As Meg, browse/search listings.
+5. As Meg, open one of Serom's listings.
+6. As Meg, save the listing and message Serom.
+7. As Serom, open Messages and show Meg's message.
+8. As Serom, open My Listings.
+9. As Serom, edit one listing.
+10. As Serom, mark one listing as sold to Meg.
 11. Open Transactions and show that the purchase was recorded.
