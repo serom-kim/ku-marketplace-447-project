@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+    <title>KU Marketplace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav>
+    <div><a href="{{ url_for('index') }}"><strong>KU Marketplace</strong></a></div>
+    <div>
+        <a href="{{ url_for('index') }}">Browse</a>
+        {% if current_user %}
+            <a href="{{ url_for('create_listing') }}">Create Listing</a>
+            <a href="{{ url_for('my_listings') }}">My Listings</a>
+            <a href="{{ url_for('saved_listings') }}">Saved</a>
+            <a href="{{ url_for('messages') }}">Messages</a>
+            <a href="{{ url_for('transactions') }}">Transactions</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <div class="flash">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

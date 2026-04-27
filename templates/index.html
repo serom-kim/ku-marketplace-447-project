@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Available Listings</h1>
+
+<div class="card">
+    <form method="get" class="search-row">
+        <input name="keyword" placeholder="Keyword" value="{{ request.args.get('keyword', '') }}">
+        <select name="category_id">
+            <option value="">All categories</option>
+            {% for c in categories %}
+                <option value="{{ c.CategoryID }}" {% if request.args.get('category_id') == c.CategoryID|string %}selected{% endif %}>
+                    {{ c.CategoryName }}
+                </option>
+            {% endfor %}
+        </select>
+        <input name="seller" placeholder="Seller" value="{{ request.args.get('seller', '') }}">
+        <input name="min_price" placeholder="Min price" value="{{ request.args.get('min_price', '') }}">
+        <input name="max_price" placeholder="Max price" value="{{ request.args.get('max_price', '') }}">
+        <button>Search</button>
+    </form>
+</div>
+
+<div class="grid">
+{% for l in listings %}
+    <div class="card">
+        {% if l.ImageURL %}
+            <img class="listing-img" src="{{ l.ImageURL }}" alt="{{ l.Title }}">
+        {% endif %}
+        <h3>{{ l.Title }}</h3>
+        <p><strong>${{ "%.2f"|format(l.Price) }}</strong></p>
+        <p>{{ l.CategoryName }} • {{ l.ItemCondition or "No condition listed" }}</p>
+        <p>Seller: {{ l.SellerName }}</p>
+        <p><span class="badge">{{ l.Status }}</span></p>
+        <a class="btn" href="{{ url_for('listing_detail', listing_id=l.ListingID) }}">View Details</a>
+    </div>
+{% else %}
+    <p>No listings found.</p>
+{% endfor %}
+</div>
+{% endblock %}

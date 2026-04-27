@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Messages</h1>
+
+{% for m in messages %}
+<div class="card">
+    <h3>{{ m.Title }}</h3>
+    <p><strong>Buyer:</strong> {{ m.BuyerName }}</p>
+    <p><strong>Seller:</strong> {{ m.SellerName }}</p>
+    <p>{{ m.MessageContent }}</p>
+    <p><small>{{ m.SentAt }}</small></p>
+    <a class="btn" href="{{ url_for('listing_detail', listing_id=m.ListingID) }}">View Listing</a>
+</div>
+{% else %}
+<p>No messages yet.</p>
+{% endfor %}
+{% endblock %}

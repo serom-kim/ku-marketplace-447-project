@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Transactions</h1>
+
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Seller</th>
+        <th>Buyer</th>
+        <th>Final Price</th>
+        <th>Date</th>
+    </tr>
+    {% for t in transactions %}
+    <tr>
+        <td>{{ t.Title }}</td>
+        <td>{{ t.SellerName }}</td>
+        <td>{{ t.BuyerName }}</td>
+        <td>${{ "%.2f"|format(t.FinalPrice) }}</td>
+        <td>{{ t.PurchaseDate }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No transactions yet.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

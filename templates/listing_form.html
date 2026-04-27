@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h1>{% if listing %}Edit Listing{% else %}Create Listing{% endif %}</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        <input name="title" placeholder="Title" value="{{ listing.Title if listing else '' }}" required>
+        <textarea name="description" placeholder="Description">{{ listing.Description if listing else '' }}</textarea>
+        <input name="price" type="number" step="0.01" min="0" placeholder="Price" value="{{ listing.Price if listing else '' }}" required>
+        <input name="condition" placeholder="Condition" value="{{ listing.ItemCondition if listing else '' }}">
+        <select name="category_id" required>
+            {% for c in categories %}
+                <option value="{{ c.CategoryID }}" {% if listing and listing.CategoryID == c.CategoryID %}selected{% endif %}>
+                    {{ c.CategoryName }}
+                </option>
+            {% endfor %}
+        </select>
+        <label>Upload Image</label>
+        <input name="image_file" type="file" accept="image/*">
+
+        {% if listing and listing.ImageURL %}
+            <p>Current image:</p>
+            <img src="{{ listing.ImageURL }}" style="max-width: 200px; border-radius: 8px;">
+        {% endif %}
+        <button>{% if listing %}Update Listing{% else %}Create Listing{% endif %}</button>
+    </form>
+</div>
+{% endblock %}

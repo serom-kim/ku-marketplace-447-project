@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    {% if listing.ImageURL %}
+        <img class="detail-img" src="{{ listing.ImageURL }}" alt="{{ listing.Title }}">
+    {% endif %}
+
+    <h1>{{ listing.Title }}</h1>
+    <p><strong>${{ "%.2f"|format(listing.Price) }}</strong></p>
+    <p><span class="badge">{{ listing.Status }}</span></p>
+    <p><strong>Category:</strong> {{ listing.CategoryName }}</p>
+    <p><strong>Condition:</strong> {{ listing.ItemCondition }}</p>
+    <p>{{ listing.Description }}</p>
+
+    <hr>
+    <h3>Seller Information</h3>
+    <p><strong>Name:</strong> {{ listing.SellerName }}</p>
+    <p><strong>Email:</strong> {{ listing.SellerEmail }}</p>
+    <p><strong>Contact:</strong> {{ listing.ContactInfo }}</p>
+
+    {% if current_user %}
+        <div class="actions">
+            <form method="post" action="{{ url_for('toggle_save', listing_id=listing.ListingID) }}">
+                <button class="btn-secondary">{{ "Unsave" if saved else "Save" }}</button>
+            </form>
+
+            {% if current_user.UserID == listing.SellerID %}
+                <a class="btn" href="{{ url_for('edit_listing', listing_id=listing.ListingID) }}">Edit</a>
+                <form method="post" action="{{ url_for('delete_listing', listing_id=listing.ListingID) }}">
+                    <button class="btn-danger" onclick="return confirm('Delete this listing?')">Delete</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+{% if current_user and current_user.UserID != listing.SellerID %}
+<div class="card">
+    <h3>Message Seller</h3>
+    <form method="post" action="{{ url_for('send_message', listing_id=listing.ListingID) }}">
+        <textarea name="message" placeholder="Hi, is this still available?" required></textarea>
+        <button>Send Message</button>
+    </form>
+</div>
+{% endif %}
+
+{% if current_user and current_user.UserID == listing.SellerID and listing.Status == "available" %}
+<div class="card">
+    <h3>Mark as Sold</h3>
+    <form method="post" action="{{ url_for('mark_sold', listing_id=listing.ListingID) }}">
+        <input name="buyer_id" type="number" placeholder="Buyer UserID" required>
+        <input name="final_price" type="number" step="0.01" min="0" value="{{ listing.Price }}" required>
+        <button>Record Transaction</button>
+    </form>
+    <p>Tip: use the Users page below to find Bob's UserID for the demo.</p>
+    <a class="btn btn-secondary" href="{{ url_for('users') }}">View Users</a>
+</div>
+{% endif %}
+{% endblock %}

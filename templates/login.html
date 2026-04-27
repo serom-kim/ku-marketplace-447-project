@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h1>Login</h1>
+    <form method="post">
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Password" required>
+        <button>Login</button>
+    </form>
+    <p>Demo accounts: serom@ku.edu or meg@ku.edu, password: password123</p>
+</div>
+{% endblock %}

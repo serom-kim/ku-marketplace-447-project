@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Saved Listings</h1>
+
+<div class="grid">
+{% for l in listings %}
+    <div class="card">
+        {% if l.ImageURL %}
+            <img class="listing-img" src="{{ l.ImageURL }}" alt="{{ l.Title }}">
+        {% endif %}
+        <h3>{{ l.Title }}</h3>
+        <p>${{ "%.2f"|format(l.Price) }}</p>
+        <p>Seller: {{ l.SellerName }}</p>
+        <a class="btn" href="{{ url_for('listing_detail', listing_id=l.ListingID) }}">View</a>
+    </div>
+{% else %}
+    <p>No saved listings yet.</p>
+{% endfor %}
+</div>
+{% endblock %}
