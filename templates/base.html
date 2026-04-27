@@ -5,34 +5,38 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<nav>
-    <div><a href="{{ url_for('index') }}"><strong>KU Marketplace</strong></a></div>
-    <div>
-        <a href="{{ url_for('index') }}">Browse</a>
-        {% if current_user %}
-            <a href="{{ url_for('create_listing') }}">Create Listing</a>
-            <a href="{{ url_for('my_listings') }}">My Listings</a>
-            <a href="{{ url_for('saved_listings') }}">Saved</a>
-            <a href="{{ url_for('messages') }}">Messages</a>
-            <a href="{{ url_for('transactions') }}">Transactions</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-        {% else %}
-            <a href="{{ url_for('login') }}">Login</a>
-            <a href="{{ url_for('register') }}">Register</a>
-        {% endif %}
-    </div>
-</nav>
+    <header class="topbar">
+        <div class="brand">
+            <a href="{{ url_for('index') }}" class="brand-link">
+                <img src="{{ url_for('static', filename='ku_logo.png') }}" alt="KU Logo" class="brand-logo">
+                <span class="brand-text">Marketplace</span>
+            </a>
+        </div>
 
-<div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, msg in messages %}
-                <div class="flash">{{ msg }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+        <div class="topbar-right">
+            {% if current_user %}
+                <a class="top-link" href="{{ url_for('my_listings') }}">My Listings</a>
+                <a class="top-link" href="{{ url_for('saved_listings') }}">Saved</a>
+                <a class="top-link" href="{{ url_for('messages') }}">Messages</a>
+                <a class="top-link" href="{{ url_for('transactions') }}">Transactions</a>
+                <a class="auth-btn secondary" href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a class="auth-btn secondary" href="{{ url_for('login') }}">Login</a>
+                <a class="auth-btn primary" href="{{ url_for('register') }}">Register</a>
+            {% endif %}
+        </div>
+    </header>
 
-    {% block content %}{% endblock %}
-</div>
+    <main class="page-wrap">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <div class="flash">{{ msg }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
 </body>
 </html>

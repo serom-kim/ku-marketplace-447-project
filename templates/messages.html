@@ -1,17 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Messages</h1>
 
-{% for m in messages %}
 <div class="card">
-    <h3>{{ m.Title }}</h3>
-    <p><strong>Buyer:</strong> {{ m.BuyerName }}</p>
-    <p><strong>Seller:</strong> {{ m.SellerName }}</p>
-    <p>{{ m.MessageContent }}</p>
-    <p><small>{{ m.SentAt }}</small></p>
-    <a class="btn" href="{{ url_for('listing_detail', listing_id=m.ListingID) }}">View Listing</a>
+    <h1>Messages</h1>
+    <p>Open a conversation to view or reply to messages.</p>
+</div>
+
+{% for chat in chats %}
+<div class="card message-thread-card">
+    <h3>{{ chat.Title }}</h3>
+
+    <p>
+        <strong>Buyer:</strong> {{ chat.BuyerName }} |
+        <strong>Seller:</strong> {{ chat.SellerName }}
+    </p>
+
+    <p>
+        <strong>Status:</strong>
+        <span class="listing-status">{{ chat.Status }}</span>
+    </p>
+
+    <p>{{ chat.LastMessage }}</p>
+    <p><small>Last message: {{ chat.LastSentAt }}</small></p>
+
+    <a class="view-btn" href="{{ url_for('chat', listing_id=chat.ListingID, buyer_id=chat.BuyerID) }}">
+        Open Chat
+    </a>
 </div>
 {% else %}
-<p>No messages yet.</p>
+<div class="card">
+    <p>No messages yet.</p>
+</div>
 {% endfor %}
+
 {% endblock %}

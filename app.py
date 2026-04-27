@@ -406,40 +406,144 @@ def send_message(listing_id):
 
     if not listing:
         flash("Listing not found.", "danger")
-    elif listing["SellerID"] == session["user_id"]:
-        flash("You cannot message yourself about your own listing.", "warning")
-    elif not content:
-        flash("Message cannot be empty.", "danger")
-    else:
-        query_db(
-            """
-            INSERT INTO Messages (BuyerID, SellerID, ListingID, MessageContent)
-            VALUES (%s, %s, %s, %s)
-            """,
-            (session["user_id"], listing["SellerID"], listing_id, content),
-            commit=True
-        )
-        flash("Message sent.", "success")
+        return redirect(url_for("index"))
 
-    return redirect(url_for("listing_detail", listing_id=listing_id))
+    if listing["SellerID"] == session["user_id"]:
+        flash("You cannot message yourself about your own listing.", "warning")
+        return redirect(url_for("listing_detail", listing_id=listing_id))
+
+    if not content:
+        flash("Message cannot be empty.", "danger")
+        return redirect(url_for("listing_detail", listing_id=listing_id))
+
+    query_db(
+        """
+        INSERT INTO Messages (BuyerID, SellerID, SenderID, ListingID, MessageContent)
+        VALUES (%s, %s, %s, %s, %s)
+        """,
+        (
+            session["user_id"],
+            listing["SellerID"],
+            session["user_id"],
+            listing_id,
+            content
+        ),
+        commit=True
+    )
+
+    flash("Message sent.", "success")
+    return redirect(url_for("chat", listing_id=listing_id, buyer_id=session["user_id"]))
 
 
 @app.route("/messages")
 @login_required
 def messages():
-    msgs = query_db(
+    chats = query_db(
         """
-        SELECT m.*, l.Title, buyer.Name AS BuyerName, seller.Name AS SellerName
+        SELECT
+            m.ListingID,
+            m.BuyerID,
+            m.SellerID,
+            l.Title,
+            l.Status,
+            buyer.Name AS BuyerName,
+            seller.Name AS SellerName,
+            MAX(m.SentAt) AS LastSentAt,
+            SUBSTRING_INDEX(
+                GROUP_CONCAT(m.MessageContent ORDER BY m.SentAt DESC SEPARATOR '|||'),
+                '|||',
+                1
+            ) AS LastMessage
         FROM Messages m
         JOIN Listings l ON m.ListingID = l.ListingID
         JOIN Users buyer ON m.BuyerID = buyer.UserID
         JOIN Users seller ON m.SellerID = seller.UserID
         WHERE m.BuyerID=%s OR m.SellerID=%s
-        ORDER BY m.SentAt DESC
+        GROUP BY m.ListingID, m.BuyerID, m.SellerID, l.Title, l.Status, buyer.Name, seller.Name
+        ORDER BY LastSentAt DESC
         """,
         (session["user_id"], session["user_id"])
     )
-    return render_template("messages.html", messages=msgs)
+
+    return render_template("messages.html", chats=chats)
+
+
+@app.route("/chat/<int:listing_id>/<int:buyer_id>", methods=["GET", "POST"])
+@login_required
+def chat(listing_id, buyer_id):
+    listing = query_db(
+        """
+        SELECT l.*, u.Name AS SellerName
+        FROM Listings l
+        JOIN Users u ON l.SellerID = u.UserID
+        WHERE l.ListingID=%s
+        """,
+        (listing_id,),
+        fetchone=True
+    )
+
+    if not listing:
+        flash("Listing not found.", "danger")
+        return redirect(url_for("messages"))
+
+    buyer = query_db(
+        "SELECT UserID, Name, Email FROM Users WHERE UserID=%s",
+        (buyer_id,),
+        fetchone=True
+    )
+
+    if not buyer:
+        flash("Buyer not found.", "danger")
+        return redirect(url_for("messages"))
+
+    is_buyer = session["user_id"] == buyer_id
+    is_seller = session["user_id"] == listing["SellerID"]
+
+    if not is_buyer and not is_seller:
+        flash("You do not have permission to view this chat.", "danger")
+        return redirect(url_for("messages"))
+
+    if request.method == "POST":
+        content = request.form["message"].strip()
+
+        if content:
+            query_db(
+                """
+                INSERT INTO Messages (BuyerID, SellerID, SenderID, ListingID, MessageContent)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                (
+                    buyer_id,
+                    listing["SellerID"],
+                    session["user_id"],
+                    listing_id,
+                    content
+                ),
+                commit=True
+            )
+            flash("Message sent.", "success")
+
+        return redirect(url_for("chat", listing_id=listing_id, buyer_id=buyer_id))
+
+    chat_messages = query_db(
+        """
+        SELECT m.*, sender.Name AS SenderName
+        FROM Messages m
+        JOIN Users sender ON m.SenderID = sender.UserID
+        WHERE m.ListingID=%s AND m.BuyerID=%s AND m.SellerID=%s
+        ORDER BY m.SentAt ASC
+        """,
+        (listing_id, buyer_id, listing["SellerID"])
+    )
+
+    return render_template(
+        "chat.html",
+        listing=listing,
+        buyer=buyer,
+        chat_messages=chat_messages,
+        is_seller=is_seller,
+        is_buyer=is_buyer
+    )
 
 
 @app.route("/listing/<int:listing_id>/sold", methods=["POST"])
@@ -463,8 +567,12 @@ def mark_sold(listing_id):
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "UPDATE Listings SET Status='sold' WHERE ListingID=%s AND SellerID=%s",
-                    (listing_id, session["user_id"])
+                    """
+                    UPDATE Listings
+                    SET Status='sold', Price=%s
+                    WHERE ListingID=%s AND SellerID=%s
+                    """,
+                    (final_price, listing_id, session["user_id"])
                 )
                 cur.execute(
                     """
@@ -481,8 +589,7 @@ def mark_sold(listing_id):
         finally:
             conn.close()
 
-    return redirect(url_for("listing_detail", listing_id=listing_id))
-
+    return redirect(request.form.get("next") or url_for("listing_detail", listing_id=listing_id))
 
 @app.route("/transactions")
 @login_required

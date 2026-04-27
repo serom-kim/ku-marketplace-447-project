@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card chat-header">
+    <h1>{{ listing.Title }}</h1>
+
+    <p>
+        <strong>Buyer:</strong> {{ buyer.Name }} |
+        <strong>Seller:</strong> {{ listing.SellerName }}
+    </p>
+
+    <p>
+        <strong>Status:</strong>
+        <span class="listing-status">{{ listing.Status }}</span>
+    </p>
+
+    <a class="view-btn" href="{{ url_for('listing_detail', listing_id=listing.ListingID) }}">
+        View Listing
+    </a>
+</div>
+
+<div class="card chat-box">
+    {% for msg in chat_messages %}
+        <div class="chat-message {% if msg.SenderID == current_user.UserID %}mine{% else %}theirs{% endif %}">
+            <div class="chat-bubble">
+                <p class="chat-sender">{{ msg.SenderName }}</p>
+                <p>{{ msg.MessageContent }}</p>
+                <small>{{ msg.SentAt }}</small>
+            </div>
+        </div>
+    {% else %}
+        <p>No messages yet.</p>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <h3>Send a Message</h3>
+    <form method="post">
+        <textarea name="message" placeholder="Type your message..." required></textarea>
+        <button type="submit">Send</button>
+    </form>
+</div>
+
+{% if is_seller and listing.Status == "available" %}
+<div class="card">
+    <h3>Mark Listing as Sold</h3>
+    <p>Use this after you and the buyer agree on the purchase.</p>
+
+    <form method="post" action="{{ url_for('mark_sold', listing_id=listing.ListingID) }}">
+        <input type="hidden" name="buyer_id" value="{{ buyer.UserID }}">
+        <input type="hidden" name="next" value="{{ url_for('chat', listing_id=listing.ListingID, buyer_id=buyer.UserID) }}">
+
+        <label>Final Price</label>
+        <input name="final_price" type="number" step="0.01" min="0" value="{{ listing.Price }}" required>
+
+        <button type="submit">Mark as Sold</button>
+    </form>
+</div>
+{% endif %}
+
+{% endblock %}
