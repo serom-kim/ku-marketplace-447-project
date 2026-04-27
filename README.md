@@ -1,6 +1,6 @@
-# Student Marketplace MVP
+# KU Marketplace 
 
-A simple Facebook Marketplace-style web app for a database class project.
+A simple Facebook Marketplace-style web app for EECS 447.
 
 ## Features
 
