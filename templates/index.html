@@ -69,7 +69,7 @@
                         <h3 class="listing-name">{{ l.Title }}</h3>
                         <p class="listing-meta">{{ l.CategoryName }}</p>
                         <p class="listing-meta">Seller: {{ l.SellerName }}</p>
-                        <p class="listing-status">{{ l.Status }}</p>
+                        <p class="listing-status status-{{ l.Status }}">{{ l.Status }}</p>
                         <a class="view-btn" href="{{ url_for('listing_detail', listing_id=l.ListingID) }}">View Details</a>
                     </div>
                 </div>

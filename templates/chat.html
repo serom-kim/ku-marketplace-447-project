@@ -11,7 +11,7 @@
 
     <p>
         <strong>Status:</strong>
-        <span class="listing-status">{{ listing.Status }}</span>
+        <span class="listing-status status-{{ listing.Status }}">{{ listing.Status }}</span>
     </p>
 
     <a class="view-btn" href="{{ url_for('listing_detail', listing_id=listing.ListingID) }}">

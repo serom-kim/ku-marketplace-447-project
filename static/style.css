@@ -268,11 +268,19 @@ a {
     margin-top: 8px;
     margin-bottom: 12px;
     padding: 5px 10px;
-    background: #eef2ff;
-    color: #0051ba;
     border-radius: 999px;
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+.status-available {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-sold {
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 .view-btn {
